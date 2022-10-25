@@ -1,0 +1,57 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rabbitmq
+  labels:
+    release: grafana-stack
+spec:
+  endpoints:
+    - port: prometheus
+      scheme: http
+      interval: 15s
+      scrapeTimeout: 14s
+    - port: prometheus-tls
+      scheme: https
+      interval: 15s
+      scrapeTimeout: 14s
+      tlsConfig:
+        insecureSkipVerify: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rabbitmq
+  namespaceSelector:
+    any: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: rabbitmq-cluster-operator
+  namespace: grafana-stack
+  labels:
+    release: grafana-stack
+spec:
+  podMetricsEndpoints:
+    - port: metrics
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rabbitmq-operator
+  namespaceSelector:
+    matchNames:
+      - rabbitmq-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: quorum-rabbitmq-perf-test
+  namespace: grafana-stack
+  labels:
+    release: grafana-stack
+spec:
+  podMetricsEndpoints:
+    - port: metrics
+  selector:
+    matchLabels:
+      app: quorum-rabbitmq-perf-test
+  namespaceSelector:
+    matchNames:
+      - default

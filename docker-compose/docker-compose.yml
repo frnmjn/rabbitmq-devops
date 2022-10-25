@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    hostname: rabbitmq
+    ports:
+      - 15692:15692
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - type: bind
+        source: ./enabled_plugins
+        target: /etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+  
+  federated-rabbitmq:
+    image: rabbitmq:3.10-management
+    hostname: rabbitmq
+    ports:
+      - 25692:15692
+      - 25672:15672
+      - 6672:5672
+    volumes:
+      - type: bind
+        source: ./enabled_plugins
+        target: /etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./grafana:/var/lib/grafana
+    user: root
+    environment:
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp4dev:25
+    ports:
+      - 3000:3000
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+    user: root
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+      
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: unless-stopped
+    ports:
+      - 2525:2525
+      - 1080:80

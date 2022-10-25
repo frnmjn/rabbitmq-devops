@@ -1,0 +1,6 @@
+
+vagrant/.vagrant/
+docker-compose/grafana/
+docker-compose/prometheus/
+k8s/bin/
+k8s/gke/.config

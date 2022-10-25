@@ -1,0 +1,23 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 2000m
+      memory: 4Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  rabbitmq:
+    # https://www.rabbitmq.com/production-checklist.html
+    # 6 GB free space
+    additionalConfig: |
+      vm_memory_high_watermark.relative = 0.6
+      disk_free_limit.relative = 1.5
+    additionalPlugins:
+      - rabbitmq_federation_management
+      - rabbitmq_shovel_management
+      - rabbitmq_stream_management
