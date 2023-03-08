@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
           sudo apt-get install rabbitmq-server -y --fix-missing
           sudo systemctl enable rabbitmq-server
           sudo systemctl start rabbitmq-server
-          sleep 10
+          sleep 20
           sudo rabbitmq-plugins enable rabbitmq_management
           sudo rabbitmqctl add_user rabbit rabbit
           sudo rabbitmqctl set_user_tags rabbit administrator

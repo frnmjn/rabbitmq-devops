@@ -13,7 +13,8 @@ spec:
       memory: 4Gi
   rabbitmq:
     # https://www.rabbitmq.com/production-checklist.html
-    # 6 GB free space
+    # memory should be occupy no more than the 60%
+    # disk free space should be 1 time and half the memory, so at last 6 GB
     additionalConfig: |
       vm_memory_high_watermark.relative = 0.6
       disk_free_limit.relative = 1.5

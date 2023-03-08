@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
   rabbitmq:
+    container_name: "rabbitmq"
     image: rabbitmq:3.10-management
+    restart: unless-stopped
     hostname: rabbitmq
     ports:
       - 15692:15692
@@ -15,24 +17,26 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rabbit
       RABBITMQ_DEFAULT_PASS: rabbit
-  
-  federated-rabbitmq:
-    image: rabbitmq:3.10-management
-    hostname: rabbitmq
-    ports:
-      - 25692:15692
-      - 25672:15672
-      - 6672:5672
-    volumes:
-      - type: bind
-        source: ./enabled_plugins
-        target: /etc/rabbitmq/enabled_plugins
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbit
-      RABBITMQ_DEFAULT_PASS: rabbit
 
+  rabbitmq-perftest:
+    container_name: "rabbitmq-perftest"
+    image: pivotalrabbitmq/perf-test
+    restart: unless-stopped
+    environment:
+      URI: "amqp://rabbit:rabbit@host.docker.internal:5672/%2f"
+      QUEUE: test
+      ROUTING_KEY: test
+      AUTOACK: "true"
+      SERVERS_STARTUP_TIMEOUT: 15
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      - rabbitmq
+  
   grafana:
+    container_name: "grafana"
     image: grafana/grafana:latest
+    restart: unless-stopped
     volumes:
       - ./grafana:/var/lib/grafana
     user: root
@@ -43,6 +47,7 @@ services:
       - 3000:3000
 
   prometheus:
+    container_name: "prometheus"
     image: prom/prometheus:latest
     restart: unless-stopped
     volumes:
@@ -60,6 +65,7 @@ services:
       - 9090:9090
       
   smtp4dev:
+    container_name: "smtp4dev"
     image: rnwood/smtp4dev:v3
     restart: unless-stopped
     ports:
