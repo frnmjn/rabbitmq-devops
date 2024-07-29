@@ -18,6 +18,21 @@ services:
       RABBITMQ_DEFAULT_USER: rabbit
       RABBITMQ_DEFAULT_PASS: rabbit
 
+  federated-rabbitmq:
+    image: rabbitmq:3.10-management
+    hostname: federated-rabbitmq
+    ports:
+      - 25692:15692
+      - 25672:15672
+      - 6672:5672
+    volumes:
+      - type: bind
+        source: ./enabled_plugins
+        target: /etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+
   rabbitmq-perftest:
     container_name: "rabbitmq-perftest"
     image: pivotalrabbitmq/perf-test
